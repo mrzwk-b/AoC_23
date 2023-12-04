@@ -38,20 +38,50 @@ fn get_right_numbers(source: &InputData, row_start: usize) -> HashSet<usize> {
     return numbers;
 }
 
+fn count_matches(source: &InputData, row: usize) -> usize {
+    let mut matches = 0;
+    let right_numbers = get_right_numbers(&source, source.row_length * row);
+    for item in get_left_numbers(&source, source.row_length * row) {
+        if right_numbers.contains(&item) {
+            matches += 1;
+        }
+    }
+    return matches;
+}
+
 fn pt_1(source: InputData) -> usize {
-    let mut matches;
     let mut total = 0;
     for row in 0..source.rows {
-        matches = 0;
-        let right_numbers = get_right_numbers(&source, source.row_length * row);
-        for item in get_left_numbers(&source, source.row_length * row) {
-            if right_numbers.contains(&item) {
-                matches += 1;
-            }
-        }
+        let matches = count_matches(&source, row);
         if matches > 0 {
             total += 1 << (matches - 1);
         }
+    }
+    return total;
+}
+
+fn parse_card(source: &InputData, row: usize, cache: &mut Vec<usize>, depth: usize) -> usize {
+    let mut cards_won = 
+        if cache.len() <= row {
+            let temp = count_matches(&source, row);
+            cache.push(temp);
+            temp
+        }
+        else {
+            cache[row]
+        }
+    ;
+    for i in row + 1..row + cards_won + 1 {
+        cards_won += parse_card(source, i, cache, depth + 1);
+    }
+    return cards_won;
+}
+
+fn pt_2(source: InputData) -> usize {
+    let mut cache = Vec::new();
+    let mut total = 0;
+    for row in 0..source.rows {
+        total += 1 + parse_card(&source, row, &mut cache, 0);
     }
     return total;
 }
@@ -74,5 +104,5 @@ fn main() {
     }
     i += 1;
     let rows = content.len() / i;
-    println!("{}", pt_1(InputData{content, left_start, right_start, rows, row_length: i}));
+    println!("{}", pt_2(InputData{content, left_start, right_start, rows, row_length: i}));
 }
