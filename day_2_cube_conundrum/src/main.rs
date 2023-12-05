@@ -1,19 +1,36 @@
-use std::cmp::Ordering;
+use std::{cmp::Ordering, collections::HashSet};
 
 struct CubeSet {
     red: usize,
     green: usize,
     blue: usize
 }
-
+impl PartialEq for CubeSet {
+    fn eq(&self, other: &Self) -> bool {
+        return self.red == other.red && self.green == other.green && self.blue == other.blue;
+    }
+}
 impl PartialOrd for CubeSet {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        match (self.red.cmp(&other.red), self.green.cmp(&other.green), self.blue.cmp(&other.blue)) {
-            (Less, Less, Less) => Some(Less),
-            (Equal, Equal, Equal) => Some(Equal),
-            (Greater, Greater, Greater) => Some(Greater)
+        let differences: HashSet<Ordering> = HashSet::from(
+            [self.red.cmp(&other.red), self.green.cmp(&other.green), self.blue.cmp(&other.blue)]);
+        if differences.contains(&Ordering::Greater) && differences.contains(&Ordering::Less) {
+            return None
+        }
+        else if differences.contains(&Ordering::Greater) {
+            return Some(Ordering::Greater);
+        }
+        else if differences.contains(&Ordering::Less) {
+            return Some(Ordering::Less);
+        }
+        else {
+            return Some(Ordering::Equal);
         }
     }
+}
+
+fn pt_1() -> usize {
+    0
 }
 
 fn main() {
