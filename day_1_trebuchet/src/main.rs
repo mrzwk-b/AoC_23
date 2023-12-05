@@ -1,4 +1,4 @@
-use std::fs;
+use std::{fs, env};
 
 fn completes_digit_name(letter: char, current_word: &mut String) -> Option<usize>{
     let mut new_word = String::new();
@@ -31,8 +31,10 @@ fn completes_digit_name(letter: char, current_word: &mut String) -> Option<usize
 
 }
 
+// code designed for CRLF .txt input
 fn main() {
-    let source = fs::read_to_string("input.txt").expect("unable to read file");
+    let args: Vec<String> = env::args().collect();
+    let source = fs::read_to_string(&args[1]).expect("unable to read file");
     let mut stream = source.bytes();
     let mut current = stream.next();
     let mut sum = 0;

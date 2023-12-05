@@ -1,4 +1,4 @@
-use std::fs;
+use std::{fs, env};
 
 struct FormattedSource<'a> {
     content: &'a Vec<u8>,
@@ -132,8 +132,10 @@ fn pt_2(FormattedSource{content, row_length, bottom_row}: FormattedSource) -> us
     gears_total
 }
 
+// code designed for CRLF .txt input
 fn main() {
-    let content = &fs::read("calibration.txt").expect("failed to read input file");
+    let args: Vec<String> = env::args().collect();
+    let content = &fs::read(&args[1]).expect("failed to read input file");
     let mut row_length = 0;
     while content[row_length] != b'\n' {
         row_length += 1;

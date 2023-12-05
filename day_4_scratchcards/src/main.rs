@@ -1,4 +1,4 @@
-use std::{fs, collections::HashSet};
+use std::{fs, collections::HashSet, env};
 
 struct InputData {
     content: Vec<u8>,
@@ -60,7 +60,7 @@ fn pt_1(source: InputData) -> usize {
     return total;
 }
 
-fn parse_card(source: &InputData, row: usize, cache: &mut Vec<usize>, depth: usize) -> usize {
+fn parse_card(source: &InputData, row: usize, cache: &mut Vec<usize>) -> usize {
     let mut cards_won = 
         if cache.len() <= row {
             let temp = count_matches(&source, row);
@@ -72,7 +72,7 @@ fn parse_card(source: &InputData, row: usize, cache: &mut Vec<usize>, depth: usi
         }
     ;
     for i in row + 1..row + cards_won + 1 {
-        cards_won += parse_card(source, i, cache, depth + 1);
+        cards_won += parse_card(source, i, cache);
     }
     return cards_won;
 }
@@ -81,13 +81,15 @@ fn pt_2(source: InputData) -> usize {
     let mut cache = Vec::new();
     let mut total = 0;
     for row in 0..source.rows {
-        total += 1 + parse_card(&source, row, &mut cache, 0);
+        total += 1 + parse_card(&source, row, &mut cache);
     }
     return total;
 }
 
+// code designed for CRLF .txt input
 fn main() {
-    let content = fs::read("input.txt").expect("failed to read input");
+    let args: Vec<String> = env::args().collect();
+    let content = fs::read(&args[1]).expect("failed to read input");
     let mut i = 0;
     while content[i] != b':' {
         i += 1;
