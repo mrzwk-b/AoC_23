@@ -1,4 +1,4 @@
-use std::{env, fs, collections::HashMap};
+use std::{env, fs, collections::HashMap, vec};
 
 // left is false, right is true
 fn get_directions(source: &Vec<u8>) -> Vec<bool> {
@@ -10,18 +10,19 @@ fn get_directions(source: &Vec<u8>) -> Vec<bool> {
     }
     return directions;
 }
-fn get_nodes(source: &Vec<u8>, start: usize) -> HashMap<&str, [&str; 2]> {
+fn get_nodes<'a>(source: &Vec<u8>, start: usize) -> HashMap<String, [String; 2]> {
     let mut nodes = HashMap::new();
     for i in 0..((source.len() - (start + 1)) / 17) {
-        nodes.insert(
-            source[start + i*17 .. start + (i*17)+3],
-            [
-                source[start + (i*17)+7 .. start + (i*17)+10, 
-                start + (i*17)+12 .. start + (i*17)+15],
-            ]
-        );
-    }
-        
+        let mut current = String::new();
+        let mut left = String::new();
+        let mut right = String::new();
+        for j in 0..3 {
+            current.push(source[start + (i*17) + j] as char);
+            left.push(source[start + (i*17) + 7 + j] as char);
+            right.push(source[start + (i*17) + 12 + j] as char);
+        }
+        nodes.insert(current, [left, right]);
+    } 
     return nodes;
 }
 
@@ -29,10 +30,11 @@ fn pt_1(source: &Vec<u8>) -> usize {
     let directions = get_directions(&source);
     let nodes = get_nodes(&source, directions.len() + 2);
 
-    let mut current_node = "AAA";
+    let mut current_node = String::from("AAA");
     let mut total = 0;
-    while current_node != "ZZZ" {
-        current_node = nodes.get(current_node).unwrap()[directions[total % directions.len()] as usize];
+    while current_node != String::from("ZZZ") {
+        println!("{current_node}");
+        current_node = nodes.get(&current_node).unwrap()[directions[total % directions.len()] as usize].clone();
         total += 1;
     }
     return total;
